@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 
+const url = 'https://ng-practice2.firebaseio.com//posts.json';
+
 @Injectable({providedIn: 'root'})
 export class PostsService {
 
@@ -12,19 +14,14 @@ export class PostsService {
 
   createAndStorePosts(postData: Post): void {
     this.http
-      .post<{ name: string }>(
-        'https://ng-practice2.firebaseio.com//posts.json',
-        postData
-      )
+      .post<{ name: string }>(url, postData)
       .subscribe(responseData => {
         console.log(responseData);
       });
   }
 
   fetchPosts(): Observable<Post[]> {
-    return this.http.get<{ [key: string]: Post }>(
-      'https://ng-practice2.firebaseio.com//posts.json'
-    )
+    return this.http.get<{ [key: string]: Post }>(url)
       .pipe(
         map(postData => {
           const postArray: Post[] = [];
@@ -36,5 +33,9 @@ export class PostsService {
           return postArray;
         })
       );
+  }
+
+  deletePosts(): Observable<Post[]> {
+    return this.http.delete<Post[]>(url);
   }
 }
