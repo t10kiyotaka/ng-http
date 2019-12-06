@@ -1,23 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Post } from './post.model';
 import { PostsService } from './posts.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   loadedPosts: Post[] = [];
   isFetching = false;
   error = null;
+  errorSub: Subject<string>;
 
   constructor(private http: HttpClient,
               private postsService: PostsService) {}
 
   ngOnInit() {
+    this.postsService.errorSub.subscribe(errorMessage => {
+      this.error = errorMessage;
+    });
     this.onFetchPosts();
+  }
+
+  ngOnDestroy() {
+    this.errorSub.unsubscribe();
   }
 
   onCreatePost(postData: { title: string; content: string }) {

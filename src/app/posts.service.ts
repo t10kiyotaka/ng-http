@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Post } from './post.model';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 
 const url = 'https://ng-practice2.firebaseio.com//posts.json';
 
 @Injectable({providedIn: 'root'})
 export class PostsService {
+  errorSub = new Subject<string>();
 
   constructor(private http: HttpClient) {}
 
@@ -17,6 +18,8 @@ export class PostsService {
       .post<{ name: string }>(url, postData)
       .subscribe(responseData => {
         console.log(responseData);
+      }, error => {
+        this.errorSub.next(error);
       });
   }
 
