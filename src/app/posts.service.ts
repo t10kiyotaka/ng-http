@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Post } from './post.model';
-import { map } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, Subject, throwError } from 'rxjs';
 
 
 const url = 'https://ng-practice2.firebaseio.com//posts.json';
@@ -15,12 +15,11 @@ export class PostsService {
 
   createAndStorePosts(postData: Post): void {
     this.http
-      .post<{ name: string }>(url, postData)
-      .subscribe(responseData => {
-        console.log(responseData);
-      }, error => {
-        this.errorSub.next(error);
-      });
+      .post<{ name: string }>(url, postData).subscribe(responseData => {
+      console.log(responseData);
+    }, error => {
+      this.errorSub.next(error);
+    });
   }
 
   fetchPosts(): Observable<Post[]> {
@@ -34,6 +33,10 @@ export class PostsService {
             }
           }
           return postArray;
+        }),
+        catchError(errorRes => {
+          // Send to analytics server
+          return throwError(errorRes);
         })
       );
   }
